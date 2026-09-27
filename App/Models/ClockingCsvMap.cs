@@ -2,9 +2,9 @@
 
 namespace App.Models
 {
-    public class MarcacionCsvMap : ClassMap<Marcacion>
+    public class ClockingCsvMap : ClassMap<Clocking>
     {
-        public MarcacionCsvMap()
+        public ClockingCsvMap()
         {
             Map(x => x.Rut).Name("rut");
             Map(x => x.FechaHora).Name("fecha_hora");

@@ -16,7 +16,7 @@ namespace App.Services
             _settings = options.Value;
         }
 
-        public List<Marcacion> Load()
+        public List<Clocking> Load()
         {
             var csvPath = GetCsvPath();
 
@@ -31,9 +31,9 @@ namespace App.Services
                 using var reader = new StreamReader(csvPath);
                 using var csv = new CsvReader(reader, csvConfig);
 
-                csv.Context.RegisterClassMap<MarcacionCsvMap>();
+                csv.Context.RegisterClassMap<ClockingCsvMap>();
 
-                return [.. csv.GetRecords<Marcacion>()];
+                return [.. csv.GetRecords<Clocking>()];
             }
             catch (Exception ex)
             {

@@ -1,6 +1,6 @@
 ﻿namespace App.Models
 {
-    public class Marcacion
+    public class Clocking
     {
         public string? Rut { get; set; }
 
