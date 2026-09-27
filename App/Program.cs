@@ -1,16 +1,34 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using App.Extensions;
+using App.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-IConfiguration configuration = new ConfigurationBuilder()
-    .SetBasePath(AppContext.BaseDirectory)
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .Build();
+var builder = Host.CreateApplicationBuilder(args);
 
-string? connectionString = configuration.GetConnectionString("Default");
+builder.Configuration.AddAppConfiguration();
+builder.Services.AddAppServices(builder.Configuration);
 
-if (string.IsNullOrEmpty(connectionString))
+var connectionString = builder.Configuration.GetConnectionString("Default");
+
+var host = builder.Build();
+
+var csvPath = host.Services
+    .GetRequiredService<CsvService>()
+    .GetCsvPath();
+
+if (!File.Exists(csvPath))
 {
-    Console.WriteLine("No se encontró la cadena de conexión.");
+    Console.WriteLine($"No se encontró el archivo CSV en: {csvPath}");
     return;
 }
 
-Console.WriteLine($"Cadena de conexión cargada: {connectionString}");
+string[] lineas = File.ReadAllLines(csvPath);
+
+Console.WriteLine($"Archivo cargado correctamente: {csvPath}");
+Console.WriteLine($"Total de líneas leídas: {lineas.Length}");
+
+foreach (var linea in lineas.Take(5))
+{
+    Console.WriteLine(linea);
+}
