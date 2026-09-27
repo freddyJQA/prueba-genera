@@ -2,7 +2,7 @@
 
 namespace App.Models
 {
-    public class ClockingCsvMap : ClassMap<Clocking>
+    public class ClockingCsvMap : ClassMap<ClockingCsv>
     {
         public ClockingCsvMap()
         {

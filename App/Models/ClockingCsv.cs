@@ -1,6 +1,6 @@
 ﻿namespace App.Models
 {
-    public class Clocking
+    public class ClockingCsv
     {
         public string? Rut { get; set; }
 

@@ -16,13 +16,13 @@ namespace App.Services
             _settings = options.Value;
         }
 
-        public List<Clocking> Load()
+        public List<ClockingCsv> Load()
         {
             var csvPath = GetCsvPath();
 
             var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                Delimiter = ",",
+                Delimiter = ";",
                 HasHeaderRecord = true,
             };
 
@@ -33,7 +33,7 @@ namespace App.Services
 
                 csv.Context.RegisterClassMap<ClockingCsvMap>();
 
-                return [.. csv.GetRecords<Clocking>()];
+                return [.. csv.GetRecords<ClockingCsv>()];
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
 ﻿using App.Extensions;
+using App.Helpers;
 using App.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,8 +14,5 @@ var connectionString = builder.Configuration.GetConnectionString("Default");
 
 var host = builder.Build();
 
-var recorsd = host.Services
-    .GetRequiredService<CsvService>()
-    .Load();
-
-var h = recorsd;
+var csvRows = host.Services.GetRequiredService<CsvService>().Load();
+var validatedCsvRows = csvRows.Select(CsvValidatorHelper.Validate).ToList();
