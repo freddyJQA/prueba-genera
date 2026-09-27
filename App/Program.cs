@@ -13,22 +13,8 @@ var connectionString = builder.Configuration.GetConnectionString("Default");
 
 var host = builder.Build();
 
-var csvPath = host.Services
+var recorsd = host.Services
     .GetRequiredService<CsvService>()
-    .GetCsvPath();
+    .Load();
 
-if (!File.Exists(csvPath))
-{
-    Console.WriteLine($"No se encontró el archivo CSV en: {csvPath}");
-    return;
-}
-
-string[] lineas = File.ReadAllLines(csvPath);
-
-Console.WriteLine($"Archivo cargado correctamente: {csvPath}");
-Console.WriteLine($"Total de líneas leídas: {lineas.Length}");
-
-foreach (var linea in lineas.Take(5))
-{
-    Console.WriteLine(linea);
-}
+var h = recorsd;
