@@ -78,7 +78,7 @@ namespace App.Services
 
             await using var writer = new StreamWriter(filePath);
 
-            await writer.WriteLineAsync("Línea,Rut,Motivo");
+            await writer.WriteLineAsync("Línea;Rut;Motivo");
 
             foreach (var row in invalidRows)
             {
