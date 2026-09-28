@@ -2,7 +2,7 @@
 
 namespace App.Helpers
 {
-    public class RutValidatorHelper
+    public static class RutValidatorHelper
     {
         public static bool IsValid(string rut)
         {

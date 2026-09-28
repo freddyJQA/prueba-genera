@@ -1,4 +1,5 @@
 ﻿using App.Config;
+using App.Repositories;
 using App.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,8 @@ namespace App.Extensions
                 configuration.GetSection(CsvSettings.SectionName));
 
             services.AddSingleton<CsvService>();
+            services.AddScoped<DatabaseRepository>();
+            services.AddScoped<DatabaseService>();
 
             return services;
         }
