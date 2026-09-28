@@ -54,5 +54,30 @@ namespace App.Services
 
             return csvPath;
         }
+
+        public static async Task GenerateInvalidCsv(
+            List<ClockingCsvValidatorResult> invalidRows)
+        {
+            if (invalidRows.Count == 0)
+                return;
+
+            Directory.CreateDirectory("output");
+
+            var filePath = Path.Combine(
+                "output",
+                $"rechazos.csv");
+
+            await using var writer = new StreamWriter(filePath);
+
+            await writer.WriteLineAsync("Rut,Motivo");
+
+            foreach (var row in invalidRows)
+            {
+                var rut = row.ClockingCsv.Rut;
+                var error = string.Join(" | ", row.Errors);
+
+                await writer.WriteLineAsync($"{rut},{error}");
+            }
+        }
     }
 }

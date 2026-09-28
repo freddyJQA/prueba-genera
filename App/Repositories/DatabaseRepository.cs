@@ -22,7 +22,12 @@ namespace App.Repositories
             await connection.OpenAsync();
 
             const string sql = """
-                SELECT TrabajadorId, Rut FROM Trabajador WHERE Rut IN @Ruts
+                SELECT TrabajadorId, Rut
+                FROM Trabajador
+                WHERE 
+                    EmpresaId = 1
+                    AND Activo = 1
+                    AND Rut IN @Ruts
                 """;
 
             var result = await connection.QueryAsync<(int Id, string Rut)>(

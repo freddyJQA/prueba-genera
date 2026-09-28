@@ -15,34 +15,70 @@ namespace App.Services
 
         public async Task Save(List<ClockingCsv> clockingsCsv)
         {
-            var clockingsToInsert = new List<Clocking>();
+            var validatedRows = ValidateRows(clockingsCsv);
 
-            var validatedCsvRows = clockingsCsv.Select(CsvValidatorHelper.Validate).ToList();
-            var validCsvRows = validatedCsvRows.Where(x => x.IsValid);
-            var invalidCsvRows = validatedCsvRows.Where(x => !x.IsValid).ToList();
+            var validRows = validatedRows
+                .Where(x => x.IsValid)
+                .ToList();
 
-            var rutsCsv = validCsvRows.Select(x => RutNormalizedHelper.Normalize(x.ClockingCsv.Rut!)).ToList();
-            var workersIds = await _repository.GetWorkersIdsByRuts(rutsCsv);
+            var invalidRows = validatedRows
+                .Where(x => !x.IsValid)
+                .ToList();
 
-            foreach (var csvRow in validCsvRows)
+            var workersIds = await GetWorkersIds(validRows);
+
+            var clockings = MapToClockings(
+                validRows,
+                workersIds,
+                invalidRows);
+
+            await _repository.InsertMany(clockings);
+
+            await CsvService.GenerateInvalidCsv(invalidRows);
+        }
+
+        private List<ClockingCsvValidatorResult> ValidateRows(List<ClockingCsv> clockingsCsv)
+        {
+            return [.. clockingsCsv.Select(CsvValidatorHelper.Validate)];
+        }
+
+        private async Task<Dictionary<string, int>> GetWorkersIds(
+            List<ClockingCsvValidatorResult> validRows)
+        {
+            var ruts = validRows
+                .Select(x => RutNormalizedHelper.Normalize(x.ClockingCsv.Rut!))
+                .ToList();
+
+            return await _repository.GetWorkersIdsByRuts(ruts);
+        }
+
+        private static List<Clocking> MapToClockings(
+            List<ClockingCsvValidatorResult> validRows,
+            Dictionary<string, int> workersIds,
+            List<ClockingCsvValidatorResult> invalidRows)
+        {
+            var clockings = new List<Clocking>();
+
+            foreach (var row in validRows)
             {
-                var rutNormalized = RutNormalizedHelper.Normalize(csvRow.ClockingCsv.Rut!);
+                var rutNormalized = RutNormalizedHelper.Normalize(row.ClockingCsv.Rut!);
 
-                if (workersIds.ContainsKey(rutNormalized))
+                if (!workersIds.TryGetValue(rutNormalized, out var workerId))
                 {
-                    var clocking = ClockingCsv.MapToClocking(csvRow.ClockingCsv, workersIds[rutNormalized]);
+                    row.Errors.Add($"RUT no asociado a ningún trabajador: '{row.ClockingCsv.Rut!}'.");
 
-                    clockingsToInsert.Add(clocking);
+                    invalidRows.Add(row);
+                    continue;
                 }
-                else
-                {
-                    csvRow.Errors.Add($"RUT no asociado a ningún trabajador: '{csvRow.ClockingCsv.Rut!}'.");
 
-                    invalidCsvRows.Add(csvRow);
-                }
+                var clocking = ClockingCsv.MapToClocking(
+                    row.ClockingCsv,
+                    workerId);
+
+                clockings.Add(clocking);
             }
 
-            await _repository.InsertMany(clockingsToInsert);
+            return clockings;
         }
     }
 }
