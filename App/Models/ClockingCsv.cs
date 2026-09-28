@@ -12,6 +12,8 @@ namespace App.Models
 
         public string? Origen {  get; set; }
 
+        public int LineNumber { get; set; }
+
         public static Clocking MapToClocking(ClockingCsv clockingCsv, int workerId)
         {
             return new Clocking()

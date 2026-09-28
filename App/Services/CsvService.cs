@@ -33,7 +33,16 @@ namespace App.Services
 
                 csv.Context.RegisterClassMap<ClockingCsvMap>();
 
-                return [.. csv.GetRecords<ClockingCsv>()];
+                var lineNumber = 2;
+                var records = new List<ClockingCsv>();
+
+                foreach (var record in csv.GetRecords<ClockingCsv>())
+                {
+                    record.LineNumber = lineNumber++;
+                    records.Add(record);
+                }
+
+                return records;
             }
             catch (Exception ex)
             {
@@ -69,14 +78,15 @@ namespace App.Services
 
             await using var writer = new StreamWriter(filePath);
 
-            await writer.WriteLineAsync("Rut,Motivo");
+            await writer.WriteLineAsync("Línea,Rut,Motivo");
 
             foreach (var row in invalidRows)
             {
+                var lineNumber = row.ClockingCsv.LineNumber;
                 var rut = row.ClockingCsv.Rut;
                 var error = string.Join(" | ", row.Errors);
 
-                await writer.WriteLineAsync($"{rut},{error}");
+                await writer.WriteLineAsync($"{lineNumber},{rut},{error}");
             }
         }
     }
