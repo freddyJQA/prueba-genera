@@ -15,7 +15,7 @@
 ```text
 bin/
 └── Debug/
-    └── net10.0/
+    └── net8.0/
         └── output/
             └── rechazos.csv
 ```
