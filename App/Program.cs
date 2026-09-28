@@ -12,4 +12,8 @@ var host = builder.Build();
 
 var csvRows = host.Services.GetRequiredService<CsvService>().Load();
 
-await host.Services.GetRequiredService<DatabaseService>().Save(csvRows);
+var resume = await host.Services.GetRequiredService<DatabaseService>().Save(csvRows);
+
+Console.WriteLine($"Leídas: {resume.Total}");
+Console.WriteLine($"Aceptadas: {resume.Accepted}");
+Console.WriteLine($"Rechazadas: {resume.Rejected}");

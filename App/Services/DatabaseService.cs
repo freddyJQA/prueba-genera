@@ -13,7 +13,7 @@ namespace App.Services
             _repository = repository;
         }
 
-        public async Task Save(List<ClockingCsv> clockingsCsv)
+        public async Task<CsvResume> Save(List<ClockingCsv> clockingsCsv)
         {
             var validatedRows = ValidateRows(clockingsCsv);
 
@@ -35,6 +35,13 @@ namespace App.Services
             await _repository.InsertMany(clockings);
 
             await CsvService.GenerateInvalidCsv(invalidRows);
+
+            return new CsvResume
+            {
+                Total = clockingsCsv.Count,
+                Accepted = clockings.Count,
+                Rejected = invalidRows.Count,
+            };
         }
 
         private List<ClockingCsvValidatorResult> ValidateRows(List<ClockingCsv> clockingsCsv)
