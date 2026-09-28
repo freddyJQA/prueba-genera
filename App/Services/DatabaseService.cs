@@ -41,6 +41,8 @@ namespace App.Services
                     invalidCsvRows.Add(csvRow);
                 }
             }
+
+            await _repository.InsertMany(clockingsToInsert);
         }
     }
 }

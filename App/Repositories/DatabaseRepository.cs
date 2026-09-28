@@ -31,5 +31,36 @@ namespace App.Repositories
 
             return result.ToDictionary(x => x.Rut, x => x.Id);
         }
+
+        public async Task InsertMany(List<Clocking> clockings)
+        {
+            const string sql = """
+                INSERT INTO dbo.Marcacion
+                    (TrabajadorId, FechaHora, Tipo, Origen)
+                VALUES
+                    (@WorkerId, @DateAndTime, @Type, @Origen)
+                """;
+
+            await using var connection = new SqlConnection(_connectionString);
+
+            await connection.OpenAsync();
+
+            await using var transaction = await connection.BeginTransactionAsync();
+
+            try
+            {
+                await connection.ExecuteAsync(
+                    sql,
+                    clockings,
+                    transaction);
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
     }
 }
